@@ -1,8 +1,9 @@
-<img width="1311" height="718" alt="изображение" src="https://github.com/user-attachments/assets/a7c007ac-501e-4ef4-8ddf-66e054329bc5" /># Список задач
+# Список задач
 
 Простое и аккуратное веб-приложение для управления задачами. Один файл, никаких зависимостей и сборки: открыл `index.html` в браузере, и всё работает.
 
-**Демо:** https://endropr.github.io/Todo-list-test-task-/
+![Скриншот приложения](screenshot.png)
+**Демо:** [ссылка на рабочий сайт](https://endropr.github.io/Todo-list-test-task-/)
 
 ## Возможности
 
@@ -30,9 +31,9 @@
 ## Запуск
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
-open index.html   # или просто дважды кликните по файлу
+git clone https://github.com/Endropr/Todo-list-test-task-.git
+cd Todo-list-test-task-
+open index.html   # macOS; на Windows: start index.html, на Linux: xdg-open index.html
 ```
 
 ### Публикация на GitHub Pages
@@ -46,6 +47,7 @@ open index.html   # или просто дважды кликните по фа�
 ```
 .
 ├── index.html   # разметка, стили и логика приложения
+├── screenshot.png # скриншот для README
 └── README.md
 ```
 
