@@ -1,10 +1,8 @@
-# Список задач
+<img width="1311" height="718" alt="изображение" src="https://github.com/user-attachments/assets/a7c007ac-501e-4ef4-8ddf-66e054329bc5" /># Список задач
 
 Простое и аккуратное веб-приложение для управления задачами. Один файл, никаких зависимостей и сборки: открыл `index.html` в браузере, и всё работает.
 
-**Демо:** [ссылка на рабочий сайт](https://endropr.github.io/Todo-list-test-task/)
-
-![Скриншот приложения](screenshot.png)
+**Демо:** https://endropr.github.io/Todo-list-test-task-/
 
 ## Возможности
 
