@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Список задач</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#F3F4F8; --surface:#FFFFFF; --ink:#161A2B; --muted:#6B7088; --line:#E4E6EF;
+  --accent:#4F46E5; --accent-ink:#FFFFFF; --accent-soft:#ECEBFD; --danger:#E5484D;
+  --shadow:0 1px 2px rgba(22,26,43,.05),0 12px 32px -12px rgba(22,26,43,.14);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0E1018; --surface:#171A26; --ink:#ECEEF7; --muted:#8C91A8; --line:#262A3B;
+    --accent:#8B85FF; --accent-ink:#0E1018; --accent-soft:#242244; --danger:#FF6B70;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 40px -16px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0E1018; --surface:#171A26; --ink:#ECEEF7; --muted:#8C91A8; --line:#262A3B;
+  --accent:#8B85FF; --accent-ink:#0E1018; --accent-soft:#242244; --danger:#FF6B70;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 40px -16px rgba(0,0,0,.6);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+  font:400 16px/1.5 "Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.wrap{max-width:620px;margin:0 auto;padding:48px 20px 64px}
+
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px}
+.date{margin:0 0 4px;color:var(--muted);font-size:15px;text-transform:capitalize}
+h1{margin:0;font-size:clamp(34px,7vw,46px);line-height:1.05;font-weight:700;letter-spacing:-.03em}
+.head-right{display:flex;align-items:center;gap:12px}
+.theme{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);
+  cursor:pointer;display:grid;place-items:center;transition:transform .2s}
+.theme:hover{transform:rotate(18deg)}
+.theme svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.ring{position:relative;width:64px;height:64px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:6}
+.ring .track{stroke:var(--line)}
+.ring .bar{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:163.36;stroke-dashoffset:163.36;
+  transition:stroke-dashoffset .6s cubic-bezier(.3,.8,.3,1)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.add{display:flex;gap:8px;padding:8px;margin-bottom:16px}
+.add input{flex:1;min-width:0;border:0;background:transparent;padding:12px 14px;font-size:16px;outline:none}
+.add input::placeholder{color:var(--muted)}
+.add:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),var(--shadow)}
+.btn{border:0;border-radius:13px;background:var(--accent);color:var(--accent-ink);font-weight:600;
+  padding:0 20px;cursor:pointer;transition:transform .15s,opacity .15s}
+.btn:hover{opacity:.9}.btn:active{transform:scale(.96)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+
+.tabs{display:flex;gap:4px;margin:0 0 12px;padding:4px;background:var(--line);border-radius:14px;width:fit-content}
+.tab{border:0;background:transparent;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+ul{list-style:none;margin:0;padding:6px}
+li{display:flex;align-items:center;gap:12px;padding:12px 10px;border-radius:14px;transition:background .15s}
+li:hover{background:var(--bg)}
+li.enter{animation:in .28s ease both}
+li.leave{animation:out .22s ease both}
+@keyframes in{from{opacity:0;transform:translateY(-6px)}}
+@keyframes out{to{opacity:0;transform:translateX(24px)}}
+
+.check{position:relative;flex:none;width:26px;height:26px;border-radius:9px;border:2px solid var(--line);background:var(--surface);
+  cursor:pointer;display:grid;place-items:center;transition:background .2s,border-color .2s,transform .15s;padding:0}
+.check:hover{border-color:var(--accent)}
+.check:active{transform:scale(.9)}
+.check svg{width:14px;height:14px;stroke:var(--accent-ink);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .25s ease .05s}
+li.done .check{background:var(--accent);border-color:var(--accent)}
+li.done .check svg{stroke-dashoffset:0}
+.text{flex:1;min-width:0;overflow-wrap:anywhere;cursor:text;transition:color .2s}
+li.done .text{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted)}
+.edit{flex:1;min-width:0;border:0;border-bottom:2px solid var(--accent);background:transparent;padding:2px 0;outline:none}
+.del{flex:none;width:32px;height:32px;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;
+  display:grid;place-items:center;opacity:0;transition:opacity .15s,color .15s,background .15s}
+li:hover .del,.del:focus-visible{opacity:1}
+.del:hover{color:var(--danger);background:var(--accent-soft)}
+.del svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (hover:none){.del{opacity:1}}
+
+.empty{padding:44px 20px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font-size:18px;font-weight:600;margin-bottom:4px}
+footer{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 14px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:14px}
+.clear{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:14px;padding:4px 8px;border-radius:8px}
+.clear:hover{color:var(--danger)}
+.hint{margin:18px 0 0;text-align:center;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div>
+      <p class="date" id="date"></p>
+      <h1>Мои задачи</h1>
+    </div>
+    <div class="head-right">
+      <button class="theme" id="theme" type="button" aria-label="Сменить тему">
+        <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <div class="ring" role="img" aria-label="Прогресс выполнения">
+        <svg viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="26"/><circle class="bar" id="bar" cx="32" cy="32" r="26"/></svg>
+        <b id="pct">0%</b>
+      </div>
+    </div>
+  </header>
+
+  <div class="card add">
+    <input id="input" type="text" maxlength="200" placeholder="Что нужно сделать?" aria-label="Новая задача" autocomplete="off">
+    <button class="btn" id="addBtn" type="button" disabled>Добавить</button>
+  </div>
+
+  <div class="tabs" role="group" aria-label="Фильтр задач">
+    <button class="tab" data-f="all" aria-pressed="true" type="button">Все</button>
+    <button class="tab" data-f="active" aria-pressed="false" type="button">Активные</button>
+    <button class="tab" data-f="done" aria-pressed="false" type="button">Выполненные</button>
+  </div>
+
+  <section class="card" aria-live="polite">
+    <ul id="list"></ul>
+    <div class="empty" id="empty" hidden></div>
+    <footer id="foot"><span id="left"></span><button class="clear" id="clear" type="button">Удалить выполненные</button></footer>
+  </section>
+  <p class="hint">Двойной клик по задаче — редактировать. Данные хранятся в браузере.</p>
+</main>
+
+<script>
+(function(){
+  var KEY="todo.tasks.v1", THEME="todo.theme";
+  var tasks=[], filter="all";
+  var $=function(id){return document.getElementById(id)};
+  var list=$("list"), input=$("input"), addBtn=$("addBtn"), empty=$("empty"), foot=$("foot");
+
+  function load(){
+    try{var r=localStorage.getItem(KEY); if(r){var p=JSON.parse(r); if(Array.isArray(p)) tasks=p;}}catch(e){}
+  }
+  function save(){ try{localStorage.setItem(KEY,JSON.stringify(tasks));}catch(e){} }
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+
+  function plural(n,a,b,c){var m=n%10,h=n%100; return (m===1&&h!==11)?a:(m>=2&&m<=4&&(h<10||h>=20))?b:c}
+
+  var CHECK='<svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+  var TRASH='<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+
+  function makeItem(t,animate){
+    var li=document.createElement("li");
+    li.dataset.id=t.id;
+    if(t.done) li.className="done";
+    if(animate) li.classList.add("enter");
+
+    var cb=document.createElement("button");
+    cb.className="check"; cb.type="button"; cb.innerHTML=CHECK;
+    cb.setAttribute("role","checkbox"); cb.setAttribute("aria-checked",String(t.done));
+    cb.setAttribute("aria-label","Отметить выполненной");
+
+    var tx=document.createElement("span");
+    tx.className="text"; tx.textContent=t.text;
+
+    var del=document.createElement("button");
+    del.className="del"; del.type="button"; del.innerHTML=TRASH; del.setAttribute("aria-label","Удалить задачу");
+
+    li.append(cb,tx,del);
+    return li;
+  }
+
+  function render(animateId){
+    var shown=tasks.filter(function(t){return filter==="all"||(filter==="done"?t.done:!t.done)});
+    list.innerHTML="";
+    shown.forEach(function(t){list.appendChild(makeItem(t,t.id===animateId))});
+
+    var total=tasks.length, done=tasks.filter(function(t){return t.done}).length, left=total-done;
+    var pct=total?Math.round(done/total*100):0;
+    $("pct").textContent=pct+"%";
+    $("bar").style.strokeDashoffset=163.36*(1-pct/100);
+    $("ring")&&0;
+
+    empty.hidden=shown.length>0;
+    if(!shown.length){
+      var msg=total===0?["Пока пусто","Добавьте первую задачу в поле выше."]
+        :filter==="done"?["Ничего не выполнено","Отметьте задачу, и она появится здесь."]
+        :["Все задачи выполнены","Можно отдохнуть или добавить новую."];
+      empty.innerHTML="<strong>"+msg[0]+"</strong>"+msg[1];
+    }
+    foot.hidden=total===0;
+    $("left").textContent=left?("Осталось "+left+" "+plural(left,"задача","задачи","задач")):"Всё сделано";
+    $("clear").hidden=done===0;
+  }
+
+  function add(){
+    var v=input.value.trim();
+    if(!v) return;
+    var t={id:uid(),text:v,done:false,created:Date.now()};
+    tasks.unshift(t); save();
+    input.value=""; addBtn.disabled=true;
+    if(filter==="done") setFilter("all"); else render(t.id);
+    input.focus();
+  }
+
+  function remove(id,li){
+    var go=function(){tasks=tasks.filter(function(t){return t.id!==id}); save(); render()};
+    if(li&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      li.classList.remove("enter"); li.classList.add("leave"); setTimeout(go,200);
+    } else go();
+  }
+
+  function startEdit(li){
+    var id=li.dataset.id, t=tasks.find(function(x){return x.id===id});
+    var tx=li.querySelector(".text"); if(!t||!tx) return;
+    var ed=document.createElement("input");
+    ed.className="edit"; ed.value=t.text; ed.maxLength=200; ed.setAttribute("aria-label","Редактировать задачу");
+    tx.replaceWith(ed); ed.focus(); ed.select();
+    var finished=false;
+    function finish(ok){
+      if(finished) return; finished=true;
+      var v=ed.value.trim();
+      if(ok&&v&&v!==t.text){t.text=v; save();}
+      render();
+    }
+    ed.addEventListener("keydown",function(e){
+      if(e.key==="Enter") finish(true);
+      if(e.key==="Escape") finish(false);
+    });
+    ed.addEventListener("blur",function(){finish(true)});
+  }
+
+  function setFilter(f){
+    filter=f;
+    document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.f===f))});
+    render();
+  }
+
+  list.addEventListener("click",function(e){
+    var li=e.target.closest("li"); if(!li) return;
+    var id=li.dataset.id;
+    if(e.target.closest(".check")){
+      var t=tasks.find(function(x){return x.id===id}); if(!t) return;
+      t.done=!t.done; save();
+      if(filter==="all"){
+        li.classList.toggle("done",t.done);
+        li.querySelector(".check").setAttribute("aria-checked",String(t.done));
+        render_meta();
+      } else render();
+    } else if(e.target.closest(".del")) remove(id,li);
+  });
+  list.addEventListener("dblclick",function(e){
+    var tx=e.target.closest(".text"); if(tx) startEdit(tx.closest("li"));
+  });
+
+  function render_meta(){
+    var total=tasks.length, done=tasks.filter(function(t){return t.done}).length, left=total-done;
+    var pct=total?Math.round(done/total*100):0;
+    $("pct").textContent=pct+"%";
+    $("bar").style.strokeDashoffset=163.36*(1-pct/100);
+    $("left").textContent=left?("Осталось "+left+" "+plural(left,"задача","задачи","задач")):"Всё сделано";
+    $("clear").hidden=done===0;
+  }
+
+  input.addEventListener("input",function(){addBtn.disabled=!input.value.trim()});
+  input.addEventListener("keydown",function(e){if(e.key==="Enter") add()});
+  addBtn.addEventListener("click",add);
+  $("clear").addEventListener("click",function(){tasks=tasks.filter(function(t){return !t.done}); save(); render()});
+  document.querySelectorAll(".tab").forEach(function(b){b.addEventListener("click",function(){setFilter(b.dataset.f)})});
+
+  // Тема
+  var root=document.documentElement;
+  try{var th=localStorage.getItem(THEME); if(th) root.setAttribute("data-theme",th);}catch(e){}
+  $("theme").addEventListener("click",function(){
+    var dark=root.getAttribute("data-theme")==="dark"||(!root.getAttribute("data-theme")&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var next=dark?"light":"dark";
+    root.setAttribute("data-theme",next);
+    try{localStorage.setItem(THEME,next);}catch(e){}
+  });
+
+  // Дата
+  try{$("date").textContent=new Intl.DateTimeFormat("ru-RU",{weekday:"long",day:"numeric",month:"long"}).format(new Date());}catch(e){}
+
+  load(); render();
+})();
+</script>
+</body>
+</html>
